@@ -10,9 +10,13 @@ do
 	if [[ "${#binding[@]}" == 1 ]]; then
 		binding[1]="${binding[0]}"
 	fi
-	echo "Port Binding found: ${binding[0]}(Container) <- ${binding[1]}(SSH Host)"
+	if [[ "${#binding[@]}" == 3 ]]; then
+		flags="${flags}-R ${binding[2]}:${binding[1]}:${binding[0]} "
+		echo "Port Binding found: ${binding[1]}:${binding[0]}(Container) -> ${binding[2]}(SSH Host)"
+		continue
+	fi
+	echo "Port Binding found: ${binding[0]}(Container) -> ${binding[1]}(SSH Host)"
 	flags="${flags}-R ${binding[1]}:127.0.0.1:${binding[0]} "
-	
 done
-
+echo "ssh $flags -i /ssh_key $TARGET_USER@$TARGET_HOST -o "TCPKeepAlive yes" -o "ServerAliveInterval 30" -o "StrictHostKeyChecking no""
 ssh $flags -i /ssh_key $TARGET_USER@$TARGET_HOST -o "TCPKeepAlive yes" -o "ServerAliveInterval 30" -o "StrictHostKeyChecking no"
